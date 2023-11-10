@@ -76,7 +76,7 @@ const ExampleComponent = () => {
   }, [mySpotState]);
 
   return (
-    <div>mySpot state says "{mySpotChange}"<div>
+    <div>mySpot state says "{mySpotState}"<div>
   )
 };
 ```
