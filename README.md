@@ -12,7 +12,8 @@ This is an approach that may be useful for some implementations, but is not mean
 
 A context invoked with this framework - works along React-Spots tooling.
 
-## How to create a new Spot?
+## How to create a new Spot?
+
 The react-spot framework is design for types in typescript. The current structure allows for declaring initial contextual information, can be directly referred to by the methods. The most performant and ergonomic way to achieve this is to separate it in two parameters:
 
 - Context - Where all contextual data (and their types) will be declared.
@@ -43,7 +44,8 @@ export const {
 );
 ```
 
-## What can be found within a Spot (context)?
+## What can be found within a Spot (context)?
+
 As of now the requirements met are states, data, and middleware (interceptors):
 
 - **context.data** - Contains data meant to be accessed throughout the Spot that may change or not but need to operate as a React state.
@@ -59,7 +61,8 @@ All of this properties with exception of the methods are typescript inferred and
 
 The way to access the methods is to use `this.* (methods)`, as you would with object methods. The reason is that in typescript the object cannot self reference itself, as in the `methods` parameters in `newSpot` objects can not refer to itself (more on this later)... if you have a solution for this let me know.
 
-## How to use a Spot?
+## How to use a Spot?
+
 Taking the blank example a few paragraphs before, you can make use of `useMySpot`:
 
 ```tsx
@@ -80,5 +83,7 @@ const ExampleComponent = () => {
   )
 };
 ```
+
+## Footnotes
 
 This is all for now - I plan to follow up with making the code more concise in the near future.
