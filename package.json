@@ -1,0 +1,41 @@
+{
+  "name": "react-spots",
+  "version": "1.0.0",
+  "description": "React context helpers/tooling.",
+  "type": "module",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.esjs",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/style.css",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "react"
+  ],
+  "author": "Joseley Rebelo",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.33",
+    "@vitejs/plugin-react-swc": "^3.0.0",
+    "react": "^18.2.0",
+    "terser": "^5.24.0",
+    "tslib": "^2.4.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.2",
+    "vite-plugin-dts": "^3.6.3"
+  }
+}

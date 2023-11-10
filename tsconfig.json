@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "declaration": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "target": "es6",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowJs": true
+  },
+  "hooks": ["copy-files"],
+  "include": ["src", "srcExcluded/react-app-env.d.ts", "srcExcluded/index.tsx"]
+}
