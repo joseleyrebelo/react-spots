@@ -10,23 +10,23 @@ import { capitalize } from "./lib/capitalize";
 import { objKeys } from "./lib/objKeys";
 
 export const newSpot = <
-  Context extends InstantiationContext,
-  Methods extends InstantiationMethods<Context>
+  Values extends Partial<InstantiationContext>,
+  Methods extends InstantiationMethods<Values>
 >(
-  values: Context,
+  values: Values,
   methods: Methods
 ) => {
-  const context = createContext(shapeData(values, methods));
-  const contextProvider = createContextProvider(context, { values, methods });
-  const useContext = () => React.useContext(context);
+  const Context = createContext(shapeData(values, methods));
+  const ContextProvider = createContextProvider(Context, { values, methods });
+  const useContext = () => React.useContext(Context);
 
-  return { context, contextProvider, useContext };
+  return { Context, ContextProvider, useContext };
 };
 
 const createContextProvider = <
   NewContext extends Context<any>,
   Data extends {
-    values: InstantiationContext;
+    values: Partial<InstantiationContext>;
     methods: InstantiationMethods<Data["values"]>;
   }
 >(
@@ -67,7 +67,7 @@ const createContextProvider = <
 };
 
 const shapeData = <
-  Context extends InstantiationContext,
+  Context extends Partial<InstantiationContext>,
   Methods extends InstantiationMethods<Context>
 >(
   values: Context,

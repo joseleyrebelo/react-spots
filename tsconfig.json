@@ -11,5 +11,10 @@
     "allowJs": true
   },
   "hooks": ["copy-files"],
-  "include": ["src", "srcExcluded/react-app-env.d.ts", "srcExcluded/index.tsx"]
+  "include": [
+    "src",
+    "srcExcluded/react-app-env.d.ts",
+    "srcExcluded/index.tsx",
+    "tests"
+  ]
 }
