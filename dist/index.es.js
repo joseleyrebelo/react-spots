@@ -941,8 +941,31 @@ function useStateCallback(initialState) {
   }, [state]);
   return [state, setStateCallback];
 }
-const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+const capitalize$1 = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 const objKeys = (data) => Object.keys(data);
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+const buildTypeGuarding = (initialValue) => Object.keys(initialValue).reduce(
+  (result, current) => ({
+    ...result,
+    ["is" + capitalize(current)]: initialValue[current]
+  }),
+  {}
+);
+const typeGuardingBase = {
+  // @notice - alternatives : typeof x === "string" || x instanceof String;
+  string: (x) => x === x + "",
+  object: (x) => typeof x === "object",
+  boolean: (x) => typeof x === "boolean",
+  array: (x) => x instanceof Array,
+  date: (x) => x instanceof Date,
+  number: (x) => typeof x === "number"
+  // Custom types
+  // null: (x: any) => x === null,
+  // undefined: (x: any) => typeof x === "undefined",
+  // empty: (x: any) => x === null || !(Object.keys(x) || x).length,
+  // falsy: (x: any) => typeof x === "undefined" ||  x === null || !(Object.keys(x) || x).length,
+};
+buildTypeGuarding(typeGuardingBase);
 const newSpot = (values, methods) => {
   const Context2 = createContext(shapeData(values, methods));
   const ContextProvider = createContextProvider(Context2, { values, methods });
@@ -982,25 +1005,21 @@ const shapeData = (values, methods, withState = false) => {
         states: { ...aggregate.states, [key]: state },
         setStates: {
           ...aggregate.setStates,
-          // @todo - "as string" - fix objKeys accuracy)
-          [`set${capitalize(key)}`]: setState
+          [`set${capitalize$1(key)}`]: setState
         }
       };
     }, {}),
-    ...methods && objKeys(methods).reduce(
-      (aggregate, key) => {
-        return {
-          ...aggregate,
-          [key]: function(...args) {
-            return methods[key](
-              this,
-              ...args
-            );
-          }
-        };
-      },
-      {}
-    )
+    ...methods && objKeys(methods).reduce((aggregate, key) => {
+      return {
+        ...aggregate,
+        [key]: function(...args) {
+          return methods[key](
+            this,
+            ...args
+          );
+        }
+      };
+    }, {})
   };
 };
 export {

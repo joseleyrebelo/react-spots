@@ -7,7 +7,7 @@ import {
 
 import useStateCallback from "./lib/useStateCallback";
 import { capitalize } from "./lib/capitalize";
-import { objKeys } from "./lib/objKeys";
+import { objKeys } from "ts-util";
 
 export const newSpot = <
   Values extends Partial<InstantiationContext>,
@@ -48,14 +48,12 @@ const createContextProvider = <
     // the respective ContextProvider.
     objKeys(props).forEach((key) => {
       if (values.states && key in values.states)
-        values.states[key as string] = props[key as keyof typeof props];
+        values.states[key] = props[key as keyof typeof props];
       else if (values.data && key in values.data)
-        values.data[key as string] = props[key as keyof typeof props];
+        values.data[key] = props[key as keyof typeof props];
       else if (values.middleware && key in values.middleware)
-        values.middleware[key as string] = props[
-          key as keyof typeof props
-        ] as any;
-      // @todo - correct for 'as any'
+        values.middleware[key] = props[key] as any;
+      // TODO: improve 'as any'
     });
 
     return (
@@ -90,25 +88,21 @@ const shapeData = <
           states: { ...aggregate.states, [key]: state },
           setStates: {
             ...aggregate.setStates,
-            // @todo - "as string" - fix objKeys accuracy)
-            [`set${capitalize(key as string)}`]: setState,
+            [`set${capitalize(key)}`]: setState,
           },
         };
       }, {} as ContextData<Context, Methods>)),
     ...(methods &&
-      (objKeys(methods) as (keyof typeof methods)[]).reduce(
-        (aggregate, key) => {
-          return {
-            ...aggregate,
-            [key]: function (...args: any[]) {
-              return methods[key](
-                this as Parameters<(typeof methods)[typeof key]>[0],
-                ...args
-              );
-            },
-          };
-        },
-        {} as ContextData<Context, Methods>
-      )),
+      objKeys(methods).reduce((aggregate, key) => {
+        return {
+          ...aggregate,
+          [key]: function (...args: any[]) {
+            return methods[key](
+              this as Parameters<(typeof methods)[typeof key]>[0],
+              ...args
+            );
+          },
+        };
+      }, {} as ContextData<Context, Methods>)),
   } as ContextData<Context, Methods>;
 };
