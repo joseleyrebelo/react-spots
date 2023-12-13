@@ -48,7 +48,9 @@ export type ContextValuesGhost<Context extends Partial<InstantiationContext>> =
     states: { [key in keyof Context["states"]]: Context["states"][key] };
     setStates: {
       [key in keyof Context["states"] & string as `set${Capitalize<key>}`]: (
-        update: SetStateAction<Context["states"][key]> | Context["states"][key],
+        update:
+          | Context["states"][key]
+          | ((state: Context["states"][key]) => Context["states"][key]),
         callback?: (state: Context["states"][key]) => void
       ) => void;
     };

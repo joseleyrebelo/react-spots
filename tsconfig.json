@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "allowJs": true
   },
+  "ariaQuery": true,
   "hooks": ["copy-files"],
   "include": [
     "src",

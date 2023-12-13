@@ -1,6 +1,5 @@
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
-import { SetStateAction } from 'react';
 
 declare type ContextData<Context extends Partial<InstantiationContext> = InstantiationContext, Methods extends InstantiationMethods<Context> = InstantiationMethods<Context>> = {
     data: ContextValuesGhost<Context>["data"];
@@ -19,7 +18,7 @@ declare type ContextValuesGhost<Context extends Partial<InstantiationContext>> =
         [key in keyof Context["states"]]: Context["states"][key];
     };
     setStates: {
-        [key in keyof Context["states"] & string as `set${Capitalize<key>}`]: (update: SetStateAction<Context["states"][key]> | Context["states"][key], callback?: (state: Context["states"][key]) => void) => void;
+        [key in keyof Context["states"] & string as `set${Capitalize<key>}`]: (update: Context["states"][key] | ((state: Context["states"][key]) => Context["states"][key]), callback?: (state: Context["states"][key]) => void) => void;
     };
     middleware: {
         [key in keyof Context["middleware"]]: (context: Context, ...args: any) => Promise<ReturnType<RevokePartial<InstantiationContext, Context>["middleware"][key]>>;
