@@ -1,8 +1,7 @@
 import "@testing-library/jest-dom";
-import { newSpot } from "../src/newSpot";
-import { render, screen } from "@testing-library/react";
-import { act } from "react-dom/test-utils";
+import { render, screen, act } from "@testing-library/react";
 import { useEffect } from "react";
+import { newSpot } from "../src/newSpot";
 
 describe("newSpot", () => {
   const { ContextProvider: Spot, useContext: useSpot } = newSpot(
@@ -27,14 +26,14 @@ describe("newSpot", () => {
   };
 
   it("Updates states on sibling component (expects 'overwritten' instead of 'initial')", async () => {
-    await act(async () => {
+    await act(async () =>
       render(
         <Spot>
           <Printer />
           <AutoUpdater value="overwritten" />
         </Spot>
-      );
-    });
+      )
+    );
 
     expect(screen.getByText("overwritten")).toBeInTheDocument();
   });
