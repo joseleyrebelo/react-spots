@@ -54,6 +54,7 @@ As of now the requirements met are states, data, and middleware (interceptors):
   - As such `states: { mySpotState: "initial" }` will be mapped into `setStates: { setMySpotState: "initial" }`, and will be accessible as `context.setStates.setMySpotState("modified.")`:
 - **context.middleware** - Contains all the middleware entries that can be declared to add specific functionality upon a certain event... (more on this later)
 - **context.\* (methods)** - Contains all methods declared on the Spot instantiation.
+- **context.isConsumer** - (auto generated) - Contains flag-value on whether this context handle is a consumer of the provider or not. As of now useContext simply returns the context, it does not enforce it being a consumer or not. Perhaps there's a need for useConsumer? ... (more on this later)
 
 ### How does it work, how to use?
 

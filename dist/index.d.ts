@@ -1,7 +1,8 @@
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 
-declare type ContextData<Context extends Partial<InstantiationContext> = InstantiationContext, Methods extends InstantiationMethods<Context> = InstantiationMethods<Context>> = {
+declare type ContextData<Context extends Partial<InstantiationValues> = InstantiationValues, Methods extends InstantiationMethods<Context> = InstantiationMethods<Context>> = {
+    isConsumer: ContextValuesGhost<Context>["isConsumer"];
     data: ContextValuesGhost<Context>["data"];
     states: ContextValuesGhost<Context>["states"];
     setStates: ContextValuesGhost<Context>["setStates"];
@@ -10,7 +11,8 @@ declare type ContextData<Context extends Partial<InstantiationContext> = Instant
     [key in keyof Methods]: (...args: SlashTuple<Parameters<Methods[key]>>) => ReturnType<Methods[key]>;
 };
 
-declare type ContextValuesGhost<Context extends Partial<InstantiationContext>> = {
+declare type ContextValuesGhost<Context extends Partial<InstantiationValues>> = {
+    isConsumer: boolean;
     data: {
         [key in keyof Context["data"]]: Context["data"][key];
     };
@@ -21,14 +23,18 @@ declare type ContextValuesGhost<Context extends Partial<InstantiationContext>> =
         [key in keyof Context["states"] & string as `set${Capitalize<key>}`]: (update: Context["states"][key] | ((state: Context["states"][key]) => Context["states"][key]), callback?: (state: Context["states"][key]) => void) => void;
     };
     middleware: {
-        [key in keyof Context["middleware"]]: (context: Context, ...args: any) => Promise<ReturnType<RevokePartial<InstantiationContext, Context>["middleware"][key]>>;
+        [key in keyof Context["middleware"]]: (context: Context, ...args: any) => Promise<ReturnType<RevokePartial<InstantiationValues, Context>["middleware"][key]>>;
     };
     methods: {
         [key: string]: (...args: any) => any;
     };
 };
 
-declare type InstantiationContext = {
+declare type InstantiationMethods<Values extends Partial<InstantiationValues> = InstantiationValues> = {
+    readonly [key: string]: (context: ContextValuesGhost<Values>, ...args: any[]) => any;
+};
+
+declare type InstantiationValues = {
     states: {
         [key: string]: any;
     };
@@ -40,11 +46,7 @@ declare type InstantiationContext = {
     };
 };
 
-declare type InstantiationMethods<Values extends Partial<InstantiationContext> = InstantiationContext> = {
-    readonly [key: string]: (context: ContextValuesGhost<Values>, ...args: any[]) => any;
-};
-
-export declare const newSpot: <Values extends Partial<InstantiationContext>, Methods extends InstantiationMethods<Values>>(values: Values, methods: Methods) => {
+export declare const newSpot: <Values extends Partial<InstantiationValues>, Methods extends InstantiationMethods<Values>>(values: Values, methods: Methods) => {
     Context: React_2.Context<ContextData<Values, Methods>>;
     ContextProvider: ({ children, ...props }: {
         children: React_2.ReactNode;

@@ -1,7 +1,7 @@
 import React, { Context, createContext, Dispatch } from "react";
 import {
   InstantiationMethods,
-  InstantiationContext,
+  InstantiationValues,
   ContextData,
 } from "./types";
 
@@ -10,50 +10,47 @@ import { capitalize } from "./lib/capitalize";
 import { objKeys } from "ts-util";
 
 export const newSpot = <
-  Values extends Partial<InstantiationContext>,
+  Values extends Partial<InstantiationValues>,
   Methods extends InstantiationMethods<Values>
 >(
   values: Values,
   methods: Methods
 ) => {
   const Context = createContext(shapeData(values, methods));
-  const ContextProvider = createContextProvider(Context, { values, methods });
+  const ContextProvider = createContextProvider(Context, values, methods);
   const useContext = () => React.useContext(Context);
 
   return { Context, ContextProvider, useContext };
 };
 
 const createContextProvider = <
-  NewContext extends Context<any>,
-  Data extends {
-    values: Partial<InstantiationContext>;
-    methods: InstantiationMethods<Data["values"]>;
-  }
+  NewContext extends Context<ContextData<Values, Methods>>,
+  Values extends Partial<InstantiationValues>,
+  Methods extends InstantiationMethods<Values>
 >(
   context: NewContext,
-  data: Data
+  values: Values,
+  methods: Methods
 ) => {
-  const { values, methods } = data;
-  return ({
+  return function contextProvider({
     children,
     ...props
   }: { children: React.ReactNode } & {
-    [key in keyof Data["values"]["states"]]?: Data["values"]["states"][key];
+    [key in keyof Values["states"]]?: Values["states"][key];
   } & {
-    [key in keyof Data["values"]["data"]]?: Data["values"]["data"][key];
+    [key in keyof Values["data"]]?: Values["data"][key];
   } & {
-    [key in keyof Data["values"]["middleware"]]?: Data["values"]["middleware"][key];
-  }) => {
-    // Overrides instantiated states with ones declared along with
-    // the respective ContextProvider.
+    [key in keyof Values["middleware"]]?: Values["middleware"][key];
+  }) {
+    // TODO: correct usage of 'as string' and 'as () => void'
+    // Overrides states declared on newSpot with ones declared directly on "Spot"ContextProvider.
     objKeys(props).forEach((key) => {
       if (values.states && key in values.states)
-        values.states[key] = props[key as keyof typeof props];
+        values.states[key as string] = props[key];
       else if (values.data && key in values.data)
-        values.data[key] = props[key as keyof typeof props];
+        values.data[key as string] = props[key];
       else if (values.middleware && key in values.middleware)
-        values.middleware[key] = props[key] as any;
-      // TODO: improve 'as any'
+        values.middleware[key as string] = props[key] as () => void;
     });
 
     return (
@@ -65,12 +62,12 @@ const createContextProvider = <
 };
 
 const shapeData = <
-  Context extends Partial<InstantiationContext>,
-  Methods extends InstantiationMethods<Context>
+  Values extends Partial<InstantiationValues>,
+  Methods extends InstantiationMethods<Values>
 >(
-  values: Context,
+  values: Values,
   methods: Methods,
-  withState: boolean = false
+  isEffectiveData: boolean = false
 ) => {
   const { states } = values;
   return {
@@ -81,28 +78,32 @@ const shapeData = <
         let state = states[key];
         let setState: Dispatch<typeof state> = () => {};
 
-        if (withState) [state, setState] = useStateCallback(states[key]);
+        if (isEffectiveData) [state, setState] = useStateCallback(states[key]);
 
         return {
           ...aggregate,
           states: { ...aggregate.states, [key]: state },
           setStates: {
             ...aggregate.setStates,
-            [`set${capitalize(key)}`]: setState,
+            // TODO: Correct usage of 'as string'
+            [`set${capitalize(key as string)}`]: setState,
           },
         };
-      }, {} as ContextData<Context, Methods>)),
+      }, {} as ContextData<Values, Methods>)),
     ...(methods &&
-      objKeys(methods).reduce((aggregate, key) => {
-        return {
+      objKeys(methods).reduce(
+        (aggregate, key) => ({
           ...aggregate,
+          // TODO: Correct usage of 'any[]'
           [key]: function (...args: any[]) {
             return methods[key](
               this as Parameters<(typeof methods)[typeof key]>[0],
               ...args
             );
           },
-        };
-      }, {} as ContextData<Context, Methods>)),
-  } as ContextData<Context, Methods>;
+        }),
+        {} as ContextData<Values, Methods>
+      )),
+    isConsumer: isEffectiveData,
+  } as ContextData<Values, Methods>;
 };

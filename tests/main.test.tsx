@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen, act } from "@testing-library/react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { newSpot } from "../src/newSpot";
 
 describe("newSpot", () => {
@@ -10,27 +10,32 @@ describe("newSpot", () => {
       getExampleState: function (context) {
         return context.states.exampleState;
       },
+      setExampleState: function (context, value) {
+        const { setExampleState } = context.setStates;
+        setExampleState(value);
+      },
     }
   );
 
-  const AutoUpdater = ({ value }: { value: string }) => {
+  const ComponentAutoUpdater = ({ value }: { value: string }) => {
     const spot = useSpot();
     // Updates state on component mount
-    useEffect(() => spot.setStates.setExampleState(value), [spot]);
+    useEffect(() => spot.setExampleState(value), [spot]);
     return <></>;
   };
 
-  const Printer = () => {
+  const ComponentPrinter = () => {
     // Prints the react state
     return <>{useSpot().getExampleState()}</>;
+    return <></>;
   };
 
   it("Updates states on sibling component (expects 'overwritten' instead of 'initial')", async () => {
     await act(async () =>
       render(
         <Spot>
-          <Printer />
-          <AutoUpdater value="overwritten" />
+          <ComponentPrinter />
+          <ComponentAutoUpdater value="overwritten" />
         </Spot>
       )
     );

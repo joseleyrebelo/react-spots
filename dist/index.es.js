@@ -968,16 +968,15 @@ const typeGuardingBase = {
 buildTypeGuarding(typeGuardingBase);
 const newSpot = (values, methods) => {
   const Context2 = createContext(shapeData(values, methods));
-  const ContextProvider = createContextProvider(Context2, { values, methods });
+  const ContextProvider = createContextProvider(Context2, values, methods);
   const useContext = () => require$$0.useContext(Context2);
   return { Context: Context2, ContextProvider, useContext };
 };
-const createContextProvider = (context, data) => {
-  const { values, methods } = data;
-  return ({
+const createContextProvider = (context, values, methods) => {
+  return function contextProvider({
     children,
     ...props
-  }) => {
+  }) {
     objKeys(props).forEach((key) => {
       if (values.states && key in values.states)
         values.states[key] = props[key];
@@ -989,7 +988,7 @@ const createContextProvider = (context, data) => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(context.Provider, { value: shapeData(values, methods, true), children });
   };
 };
-const shapeData = (values, methods, withState = false) => {
+const shapeData = (values, methods, isEffectiveData = false) => {
   const { states } = values;
   return {
     ...values,
@@ -998,28 +997,32 @@ const shapeData = (values, methods, withState = false) => {
       let state = states[key];
       let setState = () => {
       };
-      if (withState)
+      if (isEffectiveData)
         [state, setState] = useStateCallback(states[key]);
       return {
         ...aggregate,
         states: { ...aggregate.states, [key]: state },
         setStates: {
           ...aggregate.setStates,
+          // TODO: Correct usage of 'as string'
           [`set${capitalize$1(key)}`]: setState
         }
       };
     }, {}),
-    ...methods && objKeys(methods).reduce((aggregate, key) => {
-      return {
+    ...methods && objKeys(methods).reduce(
+      (aggregate, key) => ({
         ...aggregate,
+        // TODO: Correct usage of 'any[]'
         [key]: function(...args) {
           return methods[key](
             this,
             ...args
           );
         }
-      };
-    }, {})
+      }),
+      {}
+    ),
+    isConsumer: isEffectiveData
   };
 };
 export {
