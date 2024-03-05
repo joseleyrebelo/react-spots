@@ -2,7 +2,7 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 
 declare type ContextData<Context extends Partial<InstantiationValues> = InstantiationValues, Methods extends InstantiationMethods<Context> = InstantiationMethods<Context>> = {
-    isConsumer: ContextValuesGhost<Context>["isConsumer"];
+    isConsuming: ContextValuesGhost<Context>["isConsuming"];
     data: ContextValuesGhost<Context>["data"];
     states: ContextValuesGhost<Context>["states"];
     setStates: ContextValuesGhost<Context>["setStates"];
@@ -12,7 +12,7 @@ declare type ContextData<Context extends Partial<InstantiationValues> = Instanti
 };
 
 declare type ContextValuesGhost<Context extends Partial<InstantiationValues>> = {
-    isConsumer: boolean;
+    isConsuming: boolean;
     data: {
         [key in keyof Context["data"]]: Context["data"][key];
     };

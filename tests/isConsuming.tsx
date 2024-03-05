@@ -7,7 +7,7 @@ describe("newSpot", () => {
   const { useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return (
-      <div>{useSpot().isConsumer ? "is_consumer" : "is_not_consumer"}</div>
+      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
     );
   };
 
@@ -21,7 +21,7 @@ describe("newSpot", () => {
   const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return (
-      <div>{useSpot().isConsumer ? "is_consumer" : "is_not_consumer"}</div>
+      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
     );
   };
 
@@ -46,7 +46,7 @@ describe("newSpot", () => {
   const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return (
-      <div>{useSpot().isConsumer ? "is_consumer" : "is_not_consumer"}</div>
+      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
     );
   };
 
