@@ -25,7 +25,7 @@ export type ContextData<
   Context extends Partial<InstantiationValues> = InstantiationValues,
   Methods extends InstantiationMethods<Context> = InstantiationMethods<Context>
 > = {
-  isConsuming: ContextValuesGhost<Context>["isConsuming"];
+  isLive: ContextValuesGhost<Context>["isLive"];
   data: ContextValuesGhost<Context>["data"];
   states: ContextValuesGhost<Context>["states"];
   setStates: ContextValuesGhost<Context>["setStates"];
@@ -37,7 +37,7 @@ export type ContextData<
 };
 
 export type ContextValuesGhost<Context extends Partial<InstantiationValues>> = {
-  isConsuming: boolean;
+  isLive: boolean;
   data: { [key in keyof Context["data"]]: Context["data"][key] };
   states: { [key in keyof Context["states"]]: Context["states"][key] };
   setStates: {

@@ -6,9 +6,7 @@ import React from "react";
 describe("newSpot", () => {
   const { useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
-    return (
-      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
-    );
+    return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
 
   it("Expects to not be consumer", async () => {
@@ -20,9 +18,7 @@ describe("newSpot", () => {
 describe("newSpot", () => {
   const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
-    return (
-      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
-    );
+    return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
 
   it(
@@ -45,9 +41,7 @@ describe("newSpot", () => {
 describe("newSpot", () => {
   const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
   const TestComponent = () => {
-    return (
-      <div>{useSpot().isConsuming ? "is_consumer" : "is_not_consumer"}</div>
-    );
+    return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
 
   it("Expects to be consumer", async () => {

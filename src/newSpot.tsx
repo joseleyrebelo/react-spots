@@ -104,6 +104,6 @@ const shapeData = <
         }),
         {} as ContextData<Values, Methods>
       )),
-    isConsuming: isEffectiveData,
+    isLive: isEffectiveData,
   } as ContextData<Values, Methods>;
 };
