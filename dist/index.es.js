@@ -1022,7 +1022,7 @@ const shapeData = (values, methods, isEffectiveData = false) => {
       }),
       {}
     ),
-    isConsuming: isEffectiveData
+    isLive: isEffectiveData
   };
 };
 export {
