@@ -1,3 +1,4 @@
+import { Context } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 
@@ -51,7 +52,14 @@ export declare const newSpot: <Values extends Partial<InstantiationValues>, Meth
     ContextProvider: ({ children, ...props }: {
         children: React_2.ReactNode;
     } & { [key in keyof Values["states"]]?: Values["states"][key] | undefined; } & { [key_1 in keyof Values["data"]]?: Values["data"][key_1] | undefined; } & { [key_2 in keyof Values["middleware"]]?: Values["middleware"][key_2] | undefined; }) => JSX_2.Element;
-    useContext: () => ContextData<Values, Methods>;
+    useContext: (context?: ContextData<Values, Methods> | undefined) => ContextData<Values, Methods>;
+    clone: () => {
+        Context: React_2.Context<ContextData<Values, Methods>>;
+        ContextProvider: ({ children, ...props }: {
+            children: React_2.ReactNode;
+        } & { [key in keyof Values["states"]]?: Values["states"][key] | undefined; } & { [key_1 in keyof Values["data"]]?: Values["data"][key_1] | undefined; } & { [key_2 in keyof Values["middleware"]]?: Values["middleware"][key_2] | undefined; }) => JSX_2.Element;
+        useContext: (context?: ContextData<Values, Methods> | undefined) => ContextData<Values, Methods>;
+    };
 };
 
 declare type RevokePartial<Stable, Fragment extends Partial<Stable>> = {
@@ -59,5 +67,7 @@ declare type RevokePartial<Stable, Fragment extends Partial<Stable>> = {
 };
 
 declare type SlashTuple<TupleSet extends any[]> = ((...args: TupleSet) => any) extends (_: any, ..._1: infer Rest) => any ? Rest : never;
+
+export declare type UnwrapContext<U> = U extends Context<infer I> ? I : never;
 
 export { }

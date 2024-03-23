@@ -9,6 +9,11 @@ import useStateCallback from "./lib/useStateCallback";
 import { capitalize } from "./lib/capitalize";
 import { objKeys } from "ts-util";
 
+// Todo - Add to ts-util
+export type UnwrapContext<U> = U extends Context<infer I> ? I : never;
+
+// Todo Export ContextType (ts)
+
 export const newSpot = <
   Values extends Partial<InstantiationValues>,
   Methods extends InstantiationMethods<Values>
@@ -18,9 +23,36 @@ export const newSpot = <
 ) => {
   const Context = createContext(shapeData(values, methods));
   const ContextProvider = createContextProvider(Context, values, methods);
-  const useContext = () => React.useContext(Context);
+  /**
+   * Consider the scenario where a Spot is used by an component that is reused
+   * on the same render, such that multiple instances of the reusable component
+   * are affecting the same Spot, unintentionally.
+   *
+   * This could be taken as bad design or as a reductionist design, I take to
+   * the later.
+   *
+   * As to remediate/allow a more composability, react-spots useContext
+   * accepts a parameter of type context; components can be designed
+   * without having to share the Spot (instance).
+   */
+  const useContext = (context?: UnwrapContext<typeof Context>) =>
+    context ? context : React.useContext(Context);
+  /**
+   * Todo - extractor parameters - objects that allow to reshape the spot by
+   * selecting some properties, excluding some properties, overwriting some
+   * properties.
+   * - Can easily be overkill...
+   * Additionally it could ghost all functions as to remain present but have
+   * no action.
+   * - Todo, exclude clone?
+   * */
 
-  return { Context, ContextProvider, useContext };
+  const clone = () => {
+    const { Context, ContextProvider, useContext } = newSpot(values, methods);
+    return { Context, ContextProvider, useContext };
+  };
+
+  return { Context, ContextProvider, useContext, clone };
 };
 
 const createContextProvider = <

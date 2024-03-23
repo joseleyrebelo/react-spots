@@ -6,7 +6,7 @@
   "license": "ISC",
   "type": "module",
   "main": "./dist/index.umd.js",
-  "module": "./dist/index.esjs",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "style": "./dist/style.css",
   "exports": {

@@ -969,8 +969,12 @@ buildTypeGuarding(typeGuardingBase);
 const newSpot = (values, methods) => {
   const Context2 = createContext(shapeData(values, methods));
   const ContextProvider = createContextProvider(Context2, values, methods);
-  const useContext = () => require$$0.useContext(Context2);
-  return { Context: Context2, ContextProvider, useContext };
+  const useContext = (context) => context ? context : require$$0.useContext(Context2);
+  const clone = () => {
+    const { Context: Context3, ContextProvider: ContextProvider2, useContext: useContext2 } = newSpot(values, methods);
+    return { Context: Context3, ContextProvider: ContextProvider2, useContext: useContext2 };
+  };
+  return { Context: Context2, ContextProvider, useContext, clone };
 };
 const createContextProvider = (context, values, methods) => {
   return function contextProvider({
