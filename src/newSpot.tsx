@@ -24,8 +24,8 @@ export const newSpot = <
   const Context = createContext(shapeData(values, methods));
   const ContextProvider = createContextProvider(Context, values, methods);
   /**
-   * Consider the scenario where a Spot is used by an component that is reused
-   * on the same render, such that multiple instances of the reusable component
+   * Consider the scenario where a Spot is used by a component that is reused
+   * on the same render: multiple instances of the reusable component
    * are affecting the same Spot, unintentionally.
    *
    * This could be taken as bad design or as a reductionist design, I take to
