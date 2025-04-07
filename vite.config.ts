@@ -1,37 +1,28 @@
-import packageJson from "./package.json";
-
 import path from "path";
 import dts from "vite-plugin-dts";
-import react from "@vitejs/plugin-react-swc";
-
 import { defineConfig } from "vite";
+import pkgJson from "./package.json";
 
-const resolvePath = (str: string) => path.resolve(__dirname, str);
-
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), dts({ rollupTypes: true })],
+  plugins: [dts({ rollupTypes: true })],
   build: {
+    minify: true,
+		target: "modules",
     reportCompressedSize: true,
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        keep_classnames: true,
-        keep_fnames: true,
-      },
-    },
     lib: {
-      entry: resolvePath("src/index.ts"),
       name: "react-spots",
+      entry: path.resolve(__dirname, "src/index.ts"),
       fileName: (format) => `index.${format}.js`,
+      formats: ["es", "umd"],
     },
     rollupOptions: {
-      external: [...Object.keys(packageJson.peerDependencies)],
-      output: {
-        globals: {
-          react: "React",
-        },
-      },
+      external: [
+				...Object.keys(pkgJson.dependencies),
+				...Object.keys(pkgJson.peerDependencies),
+				// Must stated since `react-jsx-runtime` is interpreted as unique 
+				// and added to the bundle, although it is just the react module	
+				'react/jsx-runtime' 
+			]
     },
   },
 });

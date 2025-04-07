@@ -1,66 +1,46 @@
 import React, { Context, createContext, Dispatch } from "react";
+
 import {
-  InstantiationMethods,
-  InstantiationValues,
-  ContextData,
+  Declaration_Methods,
+  Declaration_Values,
+  Usage_Discretion,
 } from "./types";
 
+// @todo:promote useStateCallback should be in react-util
 import useStateCallback from "./lib/useStateCallback";
-import { capitalize } from "./lib/capitalize";
-import { objKeys } from "ts-util";
+import { UnwrapContext } from "react-util";
+import { objKeys, isString, capitalize } from "ts-util";
 
-// Todo - Add to ts-util
-export type UnwrapContext<U> = U extends Context<infer I> ? I : never;
-
-// Todo Export ContextType (ts)
-
+/**
+	* Returns a Spot (opinionated wrapper on context)
+	* @remarks
+	* @param values - React states and data used by the spot
+	* @param methods - Functionality related to the spot
+	* @returns A Spot set (useContext, Context, ContextProvider)
+	*/
 export const newSpot = <
-  Values extends Partial<InstantiationValues>,
-  Methods extends InstantiationMethods<Values>
+  Values extends Partial<Declaration_Values>,
+  Methods extends Declaration_Methods<Values>
 >(
   values: Values,
   methods: Methods
 ) => {
-  const Context = createContext(shapeData(values, methods));
-  const ContextProvider = createContextProvider(Context, values, methods);
-  /**
-   * Consider the scenario where a Spot is used by a component that is reused
-   * on the same render: multiple instances of the reusable component
-   * are affecting the same Spot, unintentionally.
-   *
-   * This could be taken as bad design or as a reductionist design, I take to
-   * the later.
-   *
-   * As to remediate/allow a more composability, react-spots useContext
-   * accepts a parameter of type context; components can be designed
-   * without having to share the Spot (instance).
-   */
-  const useContext = (context?: UnwrapContext<typeof Context>) =>
-    context ? context : React.useContext(Context);
-  /**
-   * Todo - extractor parameters - objects that allow to reshape the spot by
-   * selecting some properties, excluding some properties, overwriting some
-   * properties.
-   * - Can easily be overkill...
-   * Additionally it could ghost all functions as to remain present but have
-   * no action.
-   * - Todo, exclude clone?
-   * */
+  const Spot = createContext(shapeData(values, methods));
+  const SpotBounds = createContextProvider(Spot, values, methods);
+  const useSpot = (context?: typeof Spot) => 
+		React.useContext(context ? context : Spot); 
+  const clone = () => newSpot(values, methods);
 
-  const clone = () => {
-    const { Context, ContextProvider, useContext } = newSpot(values, methods);
-    return { Context, ContextProvider, useContext };
-  };
-
-  return { Context, ContextProvider, useContext, clone };
+  return { Spot, SpotBounds, useSpot, clone };
 };
 
 const createContextProvider = <
-  NewContext extends Context<ContextData<Values, Methods>>,
-  Values extends Partial<InstantiationValues>,
-  Methods extends InstantiationMethods<Values>
+	SpotDiscretion extends Usage_Discretion<Values, Methods>,
+  Spot extends Context<Usage_Discretion<Values, Methods>>,
+  Values extends Partial<Declaration_Values>,
+  Methods extends Declaration_Methods<Values>,
 >(
-  context: NewContext,
+  spot: Spot,
   values: Values,
   methods: Methods
 ) => {
@@ -68,40 +48,44 @@ const createContextProvider = <
     children,
     ...props
   }: { children: React.ReactNode } & {
-    [key in keyof Values["states"]]?: Values["states"][key];
+    [key in keyof Values["states"]]?: SpotDiscretion["states"][key];
   } & {
-    [key in keyof Values["data"]]?: Values["data"][key];
+    [key in keyof Values["data"]]?: SpotDiscretion["data"][key];
   } & {
-    [key in keyof Values["middleware"]]?: Values["middleware"][key];
+    [key in keyof Values["middleware"]]?: SpotDiscretion["middleware"][key];
   }) {
-    // TODO: correct usage of 'as string' and 'as () => void'
-    // Overrides states declared on newSpot with ones declared directly on "Spot"ContextProvider.
+		type MiddlewareKeys = keyof SpotDiscretion["middleware"]
+    // Override states, data, and middleware with(if any) prop declarations
+		// made upo implementation of the SpotProvider on newSpot with ones declared
+		// directly on "Spot" ContextProvider.
     objKeys(props).forEach((key) => {
+			if (!isString(key)) return
+
       if (values.states && key in values.states)
-        values.states[key as string] = props[key];
+        values.states[key] = props[key];
       else if (values.data && key in values.data)
-        values.data[key as string] = props[key];
+        values.data[key] = props[key];
       else if (values.middleware && key in values.middleware)
-        values.middleware[key as string] = props[key] as () => void;
+        values.middleware[key] = props[key] as SpotDiscretion["middleware"][MiddlewareKeys]
     });
 
     return (
-      <context.Provider value={shapeData(values, methods, true)}>
+      <spot.Provider value={shapeData(values, methods, true)}>
         {children}
-      </context.Provider>
+      </spot.Provider>
     );
   };
 };
 
 const shapeData = <
-  Values extends Partial<InstantiationValues>,
-  Methods extends InstantiationMethods<Values>
+  Values extends Partial<Declaration_Values>,
+  Methods extends Declaration_Methods<Values>
 >(
   values: Values,
   methods: Methods,
   isEffectiveData: boolean = false
 ) => {
-  const { states } = values;
+  const { states, middleware } = values;
   return {
     ...values,
     ...methods,
@@ -117,16 +101,25 @@ const shapeData = <
           states: { ...aggregate.states, [key]: state },
           setStates: {
             ...aggregate.setStates,
-            // TODO: Correct usage of 'as string'
+            // @todo Correct usage of 'as string'
             [`set${capitalize(key as string)}`]: setState,
           },
         };
-      }, {} as ContextData<Values, Methods>)),
+      }, {} as Usage_Discretion<Values, Methods>
+		)),
+		...(middleware && 
+			objKeys(middleware).reduce(
+				(aggregate, key) => ({
+					...aggregate,
+					[key]: middleware[key]
+				}),
+				{} as Usage_Discretion<Values, Methods>
+		)),
     ...(methods &&
       objKeys(methods).reduce(
         (aggregate, key) => ({
           ...aggregate,
-          // TODO: Correct usage of 'any[]'
+          // @todo Correct usage of 'any[]'
           [key]: function (...args: any[]) {
             return methods[key](
               this as Parameters<(typeof methods)[typeof key]>[0],
@@ -134,8 +127,8 @@ const shapeData = <
             );
           },
         }),
-        {} as ContextData<Values, Methods>
-      )),
+        {} as Usage_Discretion<Values, Methods>
+		)),
     isLive: isEffectiveData,
-  } as ContextData<Values, Methods>;
+  } as Usage_Discretion<Values, Methods>;
 };

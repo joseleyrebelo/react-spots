@@ -4,7 +4,7 @@ import { newSpot } from "../src/newSpot";
 import React from "react";
 
 describe("newSpot", () => {
-  const { useContext: useSpot } = newSpot({}, {});
+  const { useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
@@ -16,7 +16,7 @@ describe("newSpot", () => {
 });
 
 describe("newSpot", () => {
-  const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
+  const { SpotBounds, useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
@@ -28,7 +28,7 @@ describe("newSpot", () => {
       await act(async () =>
         render(
           <>
-            <Spot>{"sample children"}</Spot>
+            <SpotBounds>{"sample children"}</SpotBounds>
             <TestComponent />
           </>
         )
@@ -39,7 +39,7 @@ describe("newSpot", () => {
 });
 
 describe("newSpot", () => {
-  const { ContextProvider: Spot, useContext: useSpot } = newSpot({}, {});
+  const { SpotBounds, useSpot } = newSpot({}, {});
   const TestComponent = () => {
     return <div>{useSpot().isLive ? "is_consumer" : "is_not_consumer"}</div>;
   };
@@ -47,9 +47,9 @@ describe("newSpot", () => {
   it("Expects to be consumer", async () => {
     await act(async () =>
       render(
-        <Spot>
+        <SpotBounds>
           <TestComponent />
-        </Spot>
+        </SpotBounds>
       )
     );
     expect(screen.getByText("is_consumer")).toBeInTheDocument();

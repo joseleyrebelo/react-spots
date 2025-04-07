@@ -8,14 +8,14 @@
     "target": "es6",
     "module": "ESNext",
     "moduleResolution": "node",
-    "allowJs": true
+    "allowJs": true,
+		"preserveSymlinks": true,
+		"noErrorTruncation": true,
+		"pretty": true
   },
-  "ariaQuery": true,
   "hooks": ["copy-files"],
   "include": [
     "src",
-    "srcExcluded/react-app-env.d.ts",
-    "srcExcluded/index.tsx",
-    "tests"
+		"tests"
   ]
 }
